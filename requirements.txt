@@ -1,0 +1,19 @@
+# Pathway - Real-time streaming framework
+# Use latest available from PyPI; version pin may vary by environment
+pathway
+
+# LangGraph - Multi-agent orchestration
+langgraph>=0.0.40
+
+# LangChain - LLM framework
+langchain>=0.1.0
+langchain-openai>=0.0.5
+
+# OpenAI - LLM provider
+openai>=1.0.0
+
+# Pydantic - Data validation
+pydantic>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0

@@ -147,6 +147,33 @@ See the interface repository for query and override capabilities: [pathwaycom-ll
 
 ---
 
+## 🏆 For Hackathon Judges
+
+This project is our **Track 1: Agentic AI** submission.
+
+**Key Highlights**:
+- ✅ Real-time streaming with Pathway Engine (not batch processing)
+- ✅ 5-agent system using LangGraph (explicit orchestration, not prompt chaining)
+- ✅ LLM-powered reasoning with deterministic fallbacks
+- ✅ Production-ready architecture with human oversight layer
+- ✅ Solves real operational problem ($500K/year monitoring costs)
+
+**Documentation**:
+- **Hackathon Pitch**: See [HACKATHON.md](HACKATHON.md) for complete submission details
+- **Demo Script**: See [DEMO.md](DEMO.md) for 5-minute walkthrough
+- **Architecture**: Pathway streaming → Anomaly detection → LangGraph agents → Incident tables
+
+**What Makes This Production-Ready**:
+1. Separated backend (autonomous agents) from interface (human controls)
+2. Full audit trail for compliance (GDPR, SOC 2)
+3. LLM-agnostic (works with OpenAI, Groq, Azure, or local models)
+4. Deterministic fallbacks when LLM confidence is low
+5. Comprehensive error handling and logging
+
+**Quick Start**: `python main.py` (see demo in 60 seconds)
+
+---
+
 ## References
 
 - **Pathway Docs**: https://pathway.com/docs/

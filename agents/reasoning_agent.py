@@ -25,9 +25,22 @@ class ReasoningConfig:
     """Configuration for the Reasoning Agent."""
     use_llm: bool = True
     llm_model: str = "gpt-4o-mini"
+    llm_base_url: Optional[str] = None  # For Groq: https://api.groq.com/openai/v1
     temperature: float = 0.3
     max_tokens: int = 500
     fallback_to_rules: bool = True
+    
+    @classmethod
+    def from_env(cls) -> "ReasoningConfig":
+        """Create config from environment variables."""
+        return cls(
+            use_llm=os.getenv("USE_LLM", "true").lower() == "true",
+            llm_model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            llm_base_url=os.getenv("LLM_BASE_URL"),
+            temperature=float(os.getenv("LLM_TEMPERATURE", "0.3")),
+            max_tokens=int(os.getenv("LLM_MAX_TOKENS", "500")),
+            fallback_to_rules=True,
+        )
 
 
 # =============================================================================
@@ -201,7 +214,11 @@ class LLMReasoner:
         if self._client is None:
             try:
                 from openai import OpenAI
-                self._client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+                api_key = os.getenv("OPENAI_API_KEY") or os.getenv("GROQ_API_KEY")
+                kwargs = {"api_key": api_key}
+                if self.config.llm_base_url:
+                    kwargs["base_url"] = self.config.llm_base_url
+                self._client = OpenAI(**kwargs)
             except Exception as e:
                 print(f"[REASONING] Failed to initialize OpenAI client: {e}")
                 return None
@@ -275,7 +292,7 @@ class ReasoningAgent:
     
     def __init__(self, config: Optional[ReasoningConfig] = None):
         """Initialize the Reasoning Agent."""
-        self.config = config or ReasoningConfig()
+        self.config = config or ReasoningConfig.from_env()
         self.llm_reasoner = LLMReasoner(self.config) if self.config.use_llm else None
         self.rule_reasoner = RuleBasedReasoner()
         self.analysis_count = 0

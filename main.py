@@ -53,6 +53,8 @@ class PipelineConfig:
     
     # Agent settings
     use_llm: bool = True
+    llm_model: str = "gpt-4o-mini"
+    llm_base_url: Optional[str] = None
     dry_run_actions: bool = False
     
     # Output settings
@@ -68,6 +70,8 @@ class PipelineConfig:
             error_spike_threshold=int(os.getenv("ANOMALY_THRESHOLD", "5")),
             error_rate_threshold=float(os.getenv("ERROR_RATE_THRESHOLD", "0.3")),
             use_llm=os.getenv("USE_LLM", "true").lower() == "true",
+            llm_model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            llm_base_url=os.getenv("LLM_BASE_URL"),
             dry_run_actions=os.getenv("DRY_RUN", "false").lower() == "true",
             output_dir=os.getenv("OUTPUT_DIR", "./output"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),

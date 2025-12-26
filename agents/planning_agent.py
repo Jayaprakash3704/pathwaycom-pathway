@@ -67,9 +67,24 @@ class PlanningConfig:
     max_actions_per_plan: int = 5
     use_llm: bool = True
     llm_model: str = "gpt-4o-mini"
+    llm_base_url: Optional[str] = None  # For Groq: https://api.groq.com/openai/v1
     llm_temperature: float = 0.2
     llm_max_tokens: int = 400
     llm_confidence_threshold: float = 0.6  # below this, use rules
+    
+    @classmethod
+    def from_env(cls) -> "PlanningConfig":
+        """Create config from environment variables."""
+        return cls(
+            auto_escalate_severity=int(os.getenv("AUTO_ESCALATE_SEVERITY", "4")),
+            max_actions_per_plan=int(os.getenv("MAX_ACTIONS_PER_PLAN", "5")),
+            use_llm=os.getenv("USE_LLM", "true").lower() == "true",
+            llm_model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            llm_base_url=os.getenv("LLM_BASE_URL"),
+            llm_temperature=float(os.getenv("LLM_TEMPERATURE", "0.2")),
+            llm_max_tokens=int(os.getenv("LLM_MAX_TOKENS", "400")),
+            llm_confidence_threshold=float(os.getenv("PLANNING_CONFIDENCE_THRESHOLD", "0.6")),
+        )
 
 
 # =============================================================================
@@ -263,7 +278,11 @@ class LLMPlanner:
         if self._client is None:
             try:
                 from openai import OpenAI
-                self._client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+                api_key = os.getenv("OPENAI_API_KEY") or os.getenv("GROQ_API_KEY")
+                kwargs = {"api_key": api_key}
+                if self.config.llm_base_url:
+                    kwargs["base_url"] = self.config.llm_base_url
+                self._client = OpenAI(**kwargs)
             except Exception as e:
                 print(f"[PLANNING] Failed to init OpenAI client: {e}")
                 return None
@@ -345,7 +364,7 @@ class PlanningAgent:
     
     def __init__(self, config: Optional[PlanningConfig] = None):
         """Initialize the Planning Agent."""
-        self.config = config or PlanningConfig()
+        self.config = config or PlanningConfig.from_env()
         self.plans_created = 0
         self.llm_planner = LLMPlanner(self.config) if self.config.use_llm else None
     
